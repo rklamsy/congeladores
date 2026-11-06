@@ -1,0 +1,1059 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b5d6b">
+<meta name="color-scheme" content="light">
+<title>Congeladores</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icono-192.png">
+<link rel="apple-touch-icon" href="icono-192.png">
+<style>
+  :root {
+    --bg: #f4f1ea;
+    --card: #ffffff;
+    --ink: #1d1d1d;
+    --muted: #5a5a5a;
+    --line: #ddd6c8;
+    --teal: #0b5d6b;
+    --teal-light: #e1f0f2;
+    --green: #1b7a35;
+    --out: #b5470b;
+    --red: #c0261c;
+    --red-bg: #fdecea;
+    --amber: #a35f00;
+    --amber-bg: #fff4dc;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: Roboto, "Segoe UI", system-ui, sans-serif;
+    font-size: 22px;
+    line-height: 1.3;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-tap-highlight-color: transparent;
+  }
+  body.con-modal { overflow: hidden; }
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; touch-action: manipulation; }
+  button:disabled { cursor: default; }
+
+  .top {
+    background: var(--teal);
+    color: #fff;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  .top h1 { margin: 0; font-size: 32px; }
+  .top .fecha { font-size: 20px; opacity: .9; }
+  .top-btns { display: flex; }
+  .top-btns button, .btn-regresar {
+    background: rgba(255,255,255,.16);
+    border: 2px solid rgba(255,255,255,.5);
+    color: #fff;
+    border-radius: 12px;
+    padding: 10px 16px;
+    margin-left: 10px;
+    font-size: 20px;
+    min-height: 54px;
+  }
+  .btn-regresar { margin: 0 14px 0 0; font-size: 22px; font-weight: 700; }
+  .top-izq { display: flex; align-items: center; }
+
+  .aviso {
+    margin: 16px 16px 0;
+    background: var(--red-bg);
+    border: 2px solid var(--red);
+    color: var(--red);
+    border-radius: 14px;
+    padding: 12px 16px;
+    font-size: 22px;
+  }
+  .aviso b { color: #8f1a12; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    grid-gap: 16px;
+    padding: 16px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 18px;
+    border-left: 16px solid #999;
+    box-shadow: 0 1px 3px rgba(0,0,0,.12);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .card.bajo { background: var(--red-bg); }
+  .card-info {
+    background: none;
+    border: 0;
+    text-align: left;
+    padding: 14px 16px 6px;
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .card .nombre { font-size: 28px; font-weight: 700; }
+  .card .cant { font-size: 64px; font-weight: 800; line-height: 1.05; font-variant-numeric: tabular-nums; }
+  .card .unidad { font-size: 24px; font-weight: 600; color: var(--muted); }
+  .estado { font-size: 20px; margin-top: 4px; }
+  .estado.bajo { color: var(--red); font-weight: 800; }
+  .estado.viejo { color: var(--amber); font-weight: 700; }
+  .estado.normal { color: var(--muted); }
+  .estado.donde { color: var(--muted); font-size: 18px; }
+  .card-btns { display: flex; padding: 10px 12px 14px; }
+  .card-btns .btn { margin: 0 4px; white-space: nowrap; padding: 8px 4px; }
+  @media (max-width: 640px) {
+    .grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-gap: 12px; padding: 12px; }
+    .card .nombre { font-size: 25px; }
+    .card-btns { padding: 8px 8px 12px; }
+    .card-btns .btn { font-size: 22px; }
+  }
+
+  .btn {
+    flex: 1;
+    min-height: 66px;
+    font-size: 25px;
+    font-weight: 800;
+    border-radius: 14px;
+    border: 0;
+    padding: 8px 10px;
+  }
+  .btn-meti { background: var(--green); color: #fff; }
+  .btn-saque { background: var(--out); color: #fff; }
+  .btn-sec { background: #fff; border: 2px solid var(--teal); color: var(--teal); font-weight: 700; }
+  .btn-peligro { background: #fff; border: 2px solid var(--red); color: var(--red); font-weight: 700; }
+  .btn-rojo { background: var(--red); color: #fff; }
+  .btn-guardar { background: var(--teal); color: #fff; width: 100%; min-height: 78px; font-size: 28px; }
+  .btn-guardar:disabled { background: #b9c7c9; }
+  .btn:disabled { opacity: .45; }
+
+  .card-nuevo {
+    border: 3px dashed var(--teal);
+    background: transparent;
+    color: var(--teal);
+    border-radius: 18px;
+    min-height: 200px;
+    font-size: 28px;
+    font-weight: 800;
+  }
+
+  .seccion { padding: 0 16px 16px; max-width: 900px; margin: 0 auto; }
+  .seccion h2 { font-size: 26px; margin: 22px 0 10px; }
+  .caja {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.1);
+  }
+  .grande { font-size: 72px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+  .fila-btns { display: flex; margin: 14px -5px 0; flex-wrap: wrap; }
+  .fila-btns .btn { margin: 5px; min-width: 200px; }
+  .lote { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .lote:last-child { border-bottom: 0; }
+  .lote b { font-size: 24px; }
+  .gris { color: var(--muted); }
+  .chico { font-size: 18px; }
+
+  .mov { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .mov:last-child { border-bottom: 0; }
+  .mov .icono {
+    width: 46px; height: 46px; border-radius: 23px; flex: none;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 800; color: #fff; margin-right: 12px;
+  }
+  .mov .txt { flex: 1; }
+  .mov .hora { font-size: 18px; color: var(--muted); }
+  .mov .borrar {
+    background: none; border: 2px solid var(--line); border-radius: 10px;
+    font-size: 17px; padding: 8px 10px; color: var(--muted); margin-left: 8px;
+  }
+  .dia { font-size: 20px; font-weight: 800; color: var(--teal); margin: 18px 0 4px; }
+
+  .ajuste { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .ajuste:last-child { border-bottom: 0; }
+  .ajuste .acciones button { margin-left: 8px; }
+  .boton-chico {
+    background: #fff; border: 2px solid var(--teal); color: var(--teal);
+    border-radius: 12px; padding: 10px 14px; font-size: 20px; font-weight: 700; min-height: 52px;
+  }
+  .boton-chico.peligro { border-color: var(--red); color: var(--red); }
+
+  /* Ventanas */
+  #modal { display: none; }
+  #modal.abierto {
+    display: block;
+    position: fixed; top: 0; right: 0; bottom: 0; left: 0;
+    background: rgba(0,0,0,.45);
+    overflow-y: auto;
+    z-index: 10;
+    padding: 12px;
+  }
+  .hoja {
+    background: #fff;
+    max-width: 760px;
+    margin: 0 auto;
+    border-radius: 20px;
+    padding: 18px 18px 20px;
+  }
+  .hoja-tit { display: flex; align-items: center; margin-bottom: 4px; }
+  .hoja-tit .marca { width: 18px; height: 44px; border-radius: 6px; margin-right: 12px; flex: none; }
+  .hoja-tit h2 { margin: 0; font-size: 30px; flex: 1; }
+  .hoja-tit .cerrar {
+    background: #eee; border: 0; border-radius: 12px; font-size: 20px; padding: 10px 14px; min-height: 52px;
+  }
+  .pregunta { font-size: 25px; font-weight: 700; margin: 18px 0 10px; }
+  .nums { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); grid-gap: 10px; }
+  .num {
+    min-height: 72px; font-size: 32px; font-weight: 800;
+    background: #fff; border: 2px solid var(--line); border-radius: 14px;
+  }
+  .num.sel, .opc.sel { background: var(--teal); border-color: var(--teal); color: #fff; }
+  .num:disabled { opacity: .3; }
+  .stepper { display: flex; align-items: center; margin-top: 12px; }
+  .stepper button {
+    width: 78px; min-height: 66px; font-size: 36px; font-weight: 800;
+    border: 2px solid var(--line); background: #fff; border-radius: 14px;
+  }
+  .stepper .valor { min-width: 120px; text-align: center; font-size: 44px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .stepper .txt { font-size: 22px; color: var(--muted); margin-left: 10px; }
+  .opcs { display: flex; flex-wrap: wrap; margin: -5px; }
+  .opc {
+    margin: 5px; min-height: 64px; padding: 8px 20px; font-size: 24px; font-weight: 700;
+    background: #fff; border: 2px solid var(--line); border-radius: 14px;
+  }
+  .color { width: 72px; height: 64px; border-radius: 14px; border: 4px solid #fff; margin: 5px; box-shadow: 0 0 0 2px var(--line); }
+  .color.sel { box-shadow: 0 0 0 4px var(--ink); }
+  .texto {
+    width: 100%; font-size: 28px; padding: 14px 16px;
+    border: 2px solid var(--line); border-radius: 14px; background: #fff;
+  }
+  .texto:focus { outline: none; border-color: var(--teal); }
+  input[type=date].texto { margin-top: 10px; }
+  .consejo {
+    background: var(--amber-bg); border-radius: 14px; padding: 12px 16px; margin-top: 16px; font-size: 22px;
+  }
+  .consejo b { font-size: 23px; }
+  .error { color: var(--red); font-weight: 700; margin-top: 8px; }
+  /* El botón Guardar siempre queda a la vista, aunque la ventana no quepa en la pantalla */
+  .pie {
+    position: -webkit-sticky; position: sticky; bottom: -12px;
+    margin: 22px -18px -20px; padding: 12px 18px 20px;
+    background: #fff; border-radius: 0 0 20px 20px;
+    box-shadow: 0 -6px 10px -6px rgba(0,0,0,.15);
+  }
+  .pie .btn-sec { width: 100%; margin-top: 10px; min-height: 60px; }
+
+  #toast {
+    position: fixed; left: 12px; right: 12px; bottom: 16px;
+    max-width: 760px; margin: 0 auto;
+    background: #1f2b2d; color: #fff; border-radius: 16px;
+    padding: 14px 16px; font-size: 22px;
+    display: none; align-items: center; z-index: 20;
+    box-shadow: 0 4px 16px rgba(0,0,0,.3);
+  }
+  #toast.visible { display: flex; }
+  #toast .t { flex: 1; }
+  #toast button {
+    background: #fff; color: #1f2b2d; border: 0; border-radius: 12px;
+    font-size: 21px; font-weight: 800; padding: 12px 16px; margin-left: 12px; min-height: 54px;
+  }
+  .vacio { text-align: center; padding: 40px 20px; color: var(--muted); }
+  .espacio-abajo { height: 90px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal"></div>
+<div id="toast"></div>
+<input type="file" id="archivo" accept=".txt,.json,text/plain,application/json" style="display:none">
+<script>
+(function () {
+  'use strict';
+
+  var CLAVE = 'congeladores-v1';
+  var COLORES = ['#c62828', '#2e7d32', '#6d4c41', '#ef6c00', '#f9a825', '#6a1b9a', '#1565c0', '#546e7a'];
+  var UNIDADES = ['bolsas', 'botes', 'kilos', 'litros'];
+  var MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  var MESES_L = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+  var DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+  var OPC_DIAS = [[30, '1 mes'], [45, 'Mes y medio'], [60, '2 meses'], [90, '3 meses']];
+
+  // ---------- utilidades ----------
+  var contador = 0;
+  function uid() { return Date.now().toString(36) + (contador++).toString(36) + Math.random().toString(36).slice(2, 5); }
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function ymd(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function hoy() { return ymd(new Date()); }
+  function ayer() { var d = new Date(); d.setDate(d.getDate() - 1); return ymd(d); }
+  function parseYmd(s) { var a = s.split('-'); return new Date(+a[0], +a[1] - 1, +a[2]); }
+  function diasDesde(s) { return Math.round((parseYmd(hoy()) - parseYmd(s)) / 86400000); }
+  function fechaCorta(s) {
+    var d = parseYmd(s);
+    var t = d.getDate() + ' de ' + MESES[d.getMonth()];
+    if (d.getFullYear() !== new Date().getFullYear()) t += ' de ' + d.getFullYear();
+    return t;
+  }
+  function fechaLarga(d) { return DIAS[d.getDay()] + ' ' + d.getDate() + ' de ' + MESES_L[d.getMonth()]; }
+  function hace(dias) {
+    if (dias <= 0) return 'hoy';
+    if (dias === 1) return 'ayer';
+    if (dias < 14) return 'hace ' + dias + ' días';
+    if (dias < 60) return 'hace ' + Math.floor(dias / 7) + ' semanas';
+    var m = Math.floor(dias / 30);
+    return 'hace ' + m + (m === 1 ? ' mes' : ' meses');
+  }
+  function hora(t) {
+    var d = new Date(t), h = d.getHours(), m = d.getMinutes();
+    return (h % 12 || 12) + ':' + pad(m) + (h < 12 ? ' a. m.' : ' p. m.');
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function unidad(p, n) {
+    var u = p.unit || 'bolsas';
+    return n === 1 ? u.replace(/s$/, '') : u;
+  }
+  function cuantas(p, n) { return n + ' ' + unidad(p, n); }
+
+  // ---------- datos ----------
+  function estadoInicial() {
+    var c1 = uid(), c2 = uid();
+    var base = [
+      ['Salsa roja', '#c62828'], ['Salsa verde', '#2e7d32'], ['Barbacoa', '#6d4c41'],
+      ['Picadillo', '#ef6c00'], ['Frijoles', '#6a1b9a'], ['Deshebrada', '#f9a825'],
+      ['Chile para menudo', '#546e7a']
+    ];
+    return {
+      version: 1,
+      products: base.map(function (b) { return { id: uid(), name: b[0], color: b[1], unit: 'bolsas', min: 2 }; }),
+      freezers: [{ id: c1, name: 'Congelador 1' }, { id: c2, name: 'Congelador 2' }],
+      movements: [],
+      settings: { maxDias: 60, ultimoRespaldo: null }
+    };
+  }
+  function valido(d) {
+    return d && Array.isArray(d.products) && Array.isArray(d.freezers) && Array.isArray(d.movements) && d.settings;
+  }
+  function cargar() {
+    try {
+      var d = JSON.parse(localStorage.getItem(CLAVE));
+      if (valido(d)) return d;
+    } catch (e) {}
+    return estadoInicial();
+  }
+  var db = cargar();
+  function guardarDb() {
+    try {
+      localStorage.setItem(CLAVE, JSON.stringify(db));
+      return true;
+    } catch (e) {
+      alert('No se pudo guardar. Avísale a tu hijo.');
+      return false;
+    }
+  }
+  guardarDb();
+  if (navigator.storage && navigator.storage.persist) {
+    try { navigator.storage.persist(); } catch (e) {}
+  }
+
+  function producto(id) {
+    for (var i = 0; i < db.products.length; i++) if (db.products[i].id === id) return db.products[i];
+    return null;
+  }
+  function congelador(id) {
+    for (var i = 0; i < db.freezers.length; i++) if (db.freezers[i].id === id) return db.freezers[i];
+    return null;
+  }
+  function nombreCong(id) { var c = congelador(id); return c ? c.name : 'Sin congelador'; }
+  function productosOrdenados() {
+    return db.products.slice().sort(function (a, b) { return a.name.localeCompare(b.name, 'es'); });
+  }
+
+  // El inventario se calcula repasando todos los movimientos en orden.
+  // Cada entrada crea un "lote" (bolsas hechas el mismo día en el mismo congelador);
+  // las salidas se descuentan primero de lo más viejo.
+  function ordenLotes(pref) {
+    return function (a, b) {
+      var pa = pref && a.f === pref ? 0 : 1, pb = pref && b.f === pref ? 0 : 1;
+      if (pa !== pb) return pa - pb;
+      if (a.d !== b.d) return a.d < b.d ? -1 : 1;
+      return a.t - b.t;
+    };
+  }
+  function tomar(lotes, n, pref) {
+    var lista = lotes.filter(function (x) { return x.n > 0; }).sort(ordenLotes(pref));
+    var tomados = [];
+    for (var i = 0; i < lista.length && n > 0; i++) {
+      var k = Math.min(n, lista[i].n);
+      lista[i].n -= k;
+      n -= k;
+      tomados.push({ d: lista[i].d, f: lista[i].f, n: k });
+    }
+    return tomados;
+  }
+  function suma(lotes) { var s = 0; lotes.forEach(function (x) { s += x.n; }); return s; }
+  function calcular() {
+    var L = {};
+    db.products.forEach(function (p) { L[p.id] = []; });
+    db.movements.forEach(function (m) {
+      var b = L[m.p];
+      if (!b) return;
+      if (m.type === 'in') {
+        b.push({ d: m.d, f: m.f, n: m.n, t: m.t });
+      } else if (m.type === 'out') {
+        tomar(b, m.n, m.f);
+      } else if (m.type === 'fix') {
+        var tot = suma(b);
+        if (m.n < tot) tomar(b, tot - m.n, null);
+        else if (m.n > tot) b.push({ d: m.d, f: m.f, n: m.n - tot, t: m.t });
+      }
+    });
+    Object.keys(L).forEach(function (k) {
+      L[k] = L[k].filter(function (x) { return x.n > 0; }).sort(ordenLotes(null));
+    });
+    return L;
+  }
+  function porCongelador(lotes) {
+    var r = {}, orden = [];
+    lotes.forEach(function (x) {
+      if (!(x.f in r)) { r[x.f] = 0; orden.push(x.f); }
+      r[x.f] += x.n;
+    });
+    var pos = db.freezers.map(function (c) { return c.id; });
+    orden.sort(function (a, b) { return pos.indexOf(a) - pos.indexOf(b); });
+    return orden.map(function (f) { return { f: f, n: r[f] }; });
+  }
+  function agregarMov(m) {
+    m.id = uid();
+    m.t = Date.now();
+    db.movements.push(m);
+    guardarDb();
+    return m;
+  }
+  function borrarMov(id) {
+    db.movements = db.movements.filter(function (m) { return m.id !== id; });
+    guardarDb();
+  }
+
+  // ---------- navegación (el botón "atrás" de Android cierra ventanas y regresa) ----------
+  var pantalla = { v: 'inicio' };
+  var modal = null;
+  var draft = null;
+  var alConfirmar = null;
+
+  function ir(p) {
+    history.pushState({ p: p, m: null }, '');
+    pantalla = p;
+    modal = null;
+    render();
+    window.scrollTo(0, 0);
+  }
+  function abrir(m) {
+    draft = nuevoDraft(m);
+    history.pushState({ p: pantalla, m: m }, '');
+    modal = m;
+    renderModal();
+  }
+  function cerrarModal() {
+    if (!modal) return;
+    modal = null;
+    renderModal();
+    history.back();
+  }
+  window.addEventListener('popstate', function (e) {
+    var s = e.state || { p: { v: 'inicio' }, m: null };
+    pantalla = s.p || { v: 'inicio' };
+    modal = s.m;
+    if (modal && (modal.k === 'confirmar' || !draft || draft.para !== JSON.stringify(modal))) {
+      if (modal.k === 'confirmar') modal = null;
+      else draft = nuevoDraft(modal);
+    }
+    render();
+  });
+
+  // ---------- pantallas ----------
+  function render() {
+    var html;
+    if (pantalla.v === 'producto' && producto(pantalla.id)) html = vistaProducto(producto(pantalla.id));
+    else if (pantalla.v === 'historial') html = vistaHistorial();
+    else if (pantalla.v === 'ajustes') html = vistaAjustes();
+    else html = vistaInicio();
+    document.getElementById('app').innerHTML = html;
+    renderModal();
+  }
+
+  function estadoProducto(p, lotes) {
+    var tot = suma(lotes), lineas = [];
+    if (tot === 0) lineas.push('<div class="estado bajo">Se acabó</div>');
+    else if (tot <= p.min) lineas.push('<div class="estado bajo">Se está acabando</div>');
+    if (lotes.length) {
+      var dias = diasDesde(lotes[0].d);
+      if (dias > db.settings.maxDias) lineas.push('<div class="estado viejo">Lo más viejo es de ' + hace(dias) + '. ¡Úsalo pronto!</div>');
+      else lineas.push('<div class="estado normal">Lo más viejo es de ' + hace(dias) + '</div>');
+    }
+    return lineas.join('');
+  }
+
+  function vistaInicio() {
+    var L = calcular();
+    var prods = productosOrdenados();
+    var bajos = prods.filter(function (p) { return suma(L[p.id]) <= p.min; });
+    var h = '<header class="top"><div><h1>Congeladores</h1><div class="fecha">' + esc(fechaLarga(new Date())) + '</div></div>' +
+      '<div class="top-btns"><button data-a="historial">Historial</button><button data-a="ajustes">Ajustes</button></div></header>';
+    if (bajos.length) {
+      h += '<div class="aviso">Se está acabando: ' + bajos.map(function (p) {
+        return '<b>' + esc(p.name) + '</b> (' + suma(L[p.id]) + ')';
+      }).join(', ') + '</div>';
+    }
+    h += '<div class="grid">';
+    prods.forEach(function (p) {
+      var lotes = L[p.id], tot = suma(lotes), bajo = tot <= p.min;
+      var donde = porCongelador(lotes);
+      h += '<div class="card' + (bajo ? ' bajo' : '') + '" style="border-left-color:' + esc(p.color) + '">' +
+        '<button class="card-info" data-a="producto" data-id="' + p.id + '">' +
+        '<div class="nombre">' + esc(p.name) + '</div>' +
+        '<div class="cant">' + tot + ' <span class="unidad">' + esc(unidad(p, tot)) + '</span></div>' +
+        estadoProducto(p, lotes) +
+        (db.freezers.length > 1 && donde.length ? '<div class="estado donde">' + donde.map(function (x) {
+          return esc(nombreCong(x.f)) + ': ' + x.n;
+        }).join('<br>') + '</div>' : '') +
+        '</button>' +
+        '<div class="card-btns">' +
+        '<button class="btn btn-meti" data-a="meti" data-id="' + p.id + '">+ Metí</button>' +
+        '<button class="btn btn-saque" data-a="saque" data-id="' + p.id + '">− Saqué</button>' +
+        '</div></div>';
+    });
+    h += '<button class="card-nuevo" data-a="nuevo">+ Producto nuevo</button>';
+    h += '</div><div class="espacio-abajo"></div>';
+    return h;
+  }
+
+  function encabezado(titulo) {
+    return '<header class="top"><div class="top-izq"><button class="btn-regresar" data-a="regresar">← Regresar</button>' +
+      '<h1>' + esc(titulo) + '</h1></div></header>';
+  }
+
+  function textoMov(m) {
+    var p = producto(m.p);
+    if (!p) return '';
+    if (m.type === 'in') {
+      var t = 'Metiste <b>' + cuantas(p, m.n) + '</b> de ' + esc(p.name);
+      if (db.freezers.length > 1) t += ' · ' + esc(nombreCong(m.f));
+      if (m.d !== ymd(new Date(m.t))) t += ' · del ' + fechaCorta(m.d);
+      return t;
+    }
+    if (m.type === 'out') return 'Sacaste <b>' + cuantas(p, m.n) + '</b> de ' + esc(p.name);
+    return 'Corregiste ' + esc(p.name) + ': había ' + m.prev + ', hay <b>' + m.n + '</b>';
+  }
+  function iconoMov(m) {
+    if (m.type === 'in') return '<div class="icono" style="background:var(--green)">+</div>';
+    if (m.type === 'out') return '<div class="icono" style="background:var(--out)">−</div>';
+    return '<div class="icono" style="background:#777">=</div>';
+  }
+  function filaMov(m) {
+    return '<div class="mov">' + iconoMov(m) + '<div class="txt">' + textoMov(m) +
+      '<div class="hora">' + hora(m.t) + '</div></div>' +
+      '<button class="borrar" data-a="borrarMov" data-id="' + m.id + '">Borrar</button></div>';
+  }
+  function tituloDia(t) {
+    var s = ymd(new Date(t));
+    if (s === hoy()) return 'Hoy';
+    if (s === ayer()) return 'Ayer';
+    var d = new Date(t);
+    return DIAS[d.getDay()] + ' ' + fechaCorta(s);
+  }
+  function listaMovs(movs) {
+    var h = '', dia = null;
+    movs.forEach(function (m) {
+      var td = tituloDia(m.t);
+      if (td !== dia) { dia = td; h += '<div class="dia">' + esc(td) + '</div>'; }
+      h += filaMov(m);
+    });
+    return h;
+  }
+
+  function vistaProducto(p) {
+    var lotes = calcular()[p.id], tot = suma(lotes);
+    var h = encabezado(p.name) + '<div class="seccion">';
+    h += '<div class="caja" style="margin-top:16px;border-left:16px solid ' + esc(p.color) + '">' +
+      '<div class="grande">' + tot + ' <span class="unidad" style="font-size:30px">' + esc(unidad(p, tot)) + '</span></div>' +
+      estadoProducto(p, lotes) +
+      '<div class="fila-btns"><button class="btn btn-meti" data-a="meti" data-id="' + p.id + '">+ Metí</button>' +
+      '<button class="btn btn-saque" data-a="saque" data-id="' + p.id + '">− Saqué</button></div></div>';
+
+    if (lotes.length) {
+      h += '<h2>Dónde está</h2><div class="caja">';
+      lotes.forEach(function (x) {
+        h += '<div class="lote"><b>' + cuantas(p, x.n) + '</b>' +
+          (db.freezers.length > 1 ? ' en ' + esc(nombreCong(x.f)) : '') +
+          '<div class="gris">Hechas el ' + fechaCorta(x.d) + ' (' + hace(diasDesde(x.d)) + ')</div></div>';
+      });
+      h += '</div>';
+    }
+
+    h += '<div class="fila-btns"><button class="btn btn-sec" data-a="corregir" data-id="' + p.id + '">Corregir cuántas hay</button>' +
+      '<button class="btn btn-sec" data-a="editar" data-id="' + p.id + '">Cambiar nombre o color</button></div>';
+
+    var movs = db.movements.filter(function (m) { return m.p === p.id; }).slice(-10).reverse();
+    if (movs.length) h += '<h2>Últimos movimientos</h2><div class="caja">' + listaMovs(movs) + '</div>';
+
+    h += '<div class="fila-btns" style="margin-top:30px"><button class="btn btn-peligro" data-a="borrarProd" data-id="' + p.id + '">Borrar este producto</button></div>';
+    h += '</div><div class="espacio-abajo"></div>';
+    return h;
+  }
+
+  function vistaHistorial() {
+    var movs = db.movements.slice(-300).reverse();
+    var h = encabezado('Historial') + '<div class="seccion">';
+    if (!movs.length) h += '<div class="vacio">Todavía no hay movimientos.</div>';
+    else h += '<div class="caja" style="margin-top:16px">' + listaMovs(movs) + '</div>';
+    h += '<p class="gris chico">Si algo quedó mal, toca <b>Borrar</b> en ese movimiento y vuelve a registrarlo.</p>';
+    return h + '</div><div class="espacio-abajo"></div>';
+  }
+
+  function vistaAjustes() {
+    var L = calcular();
+    var h = encabezado('Ajustes') + '<div class="seccion">';
+    h += '<h2>Congeladores</h2><div class="caja">';
+    db.freezers.forEach(function (c) {
+      var n = 0;
+      Object.keys(L).forEach(function (k) { L[k].forEach(function (x) { if (x.f === c.id) n += x.n; }); });
+      h += '<div class="ajuste"><div><b>' + esc(c.name) + '</b><div class="gris chico">' + n + ' bolsas o botes adentro</div></div>' +
+        '<div class="acciones"><button class="boton-chico" data-a="renCong" data-id="' + c.id + '">Cambiar nombre</button>' +
+        '<button class="boton-chico peligro" data-a="borrarCong" data-id="' + c.id + '">Quitar</button></div></div>';
+    });
+    h += '<div class="fila-btns"><button class="btn btn-sec" data-a="nuevoCong">+ Agregar congelador</button></div></div>';
+
+    h += '<h2>Avisar cuando la comida lleve más de…</h2><div class="caja"><div class="opcs">';
+    OPC_DIAS.forEach(function (o) {
+      h += '<button class="opc' + (db.settings.maxDias === o[0] ? ' sel' : '') + '" data-a="maxDias" data-v="' + o[0] + '">' + o[1] + '</button>';
+    });
+    h += '</div></div>';
+
+    var ult = db.settings.ultimoRespaldo;
+    h += '<h2>Respaldo</h2><div class="caja">' +
+      '<p style="margin-top:0">Todo se guarda solo en esta tablet. Manda un respaldo de vez en cuando (por WhatsApp o correo) por si la tablet se descompone.</p>' +
+      '<p class="gris">Último respaldo: ' + (ult ? fechaCorta(ymd(new Date(ult))) + ' (' + hace(diasDesde(ymd(new Date(ult)))) + ')' : 'nunca') + '</p>' +
+      '<div class="fila-btns"><button class="btn btn-sec" data-a="respaldo">Mandar respaldo</button>' +
+      '<button class="btn btn-sec" data-a="recuperar">Recuperar respaldo</button></div></div>';
+    h += '<p class="gris chico">Congeladores · versión 1</p>';
+    return h + '</div><div class="espacio-abajo"></div>';
+  }
+
+  // ---------- ventanas ----------
+  function nuevoDraft(m) {
+    var d = { para: JSON.stringify(m), n: 0, f: null, d: hoy(), cuando: 'hoy', error: '' };
+    var p = m.id ? producto(m.id) : null;
+    if (m.k === 'in') {
+      d.f = db.freezers.length ? db.freezers[0].id : null;
+      for (var i = db.movements.length - 1; i >= 0; i--) {
+        var mv = db.movements[i];
+        if (mv.p === m.id && mv.type === 'in' && congelador(mv.f)) { d.f = mv.f; break; }
+      }
+    } else if (m.k === 'out') {
+      var lotes = calcular()[m.id] || [];
+      d.f = lotes.length ? lotes[0].f : null;
+    } else if (m.k === 'fix') {
+      d.n = suma(calcular()[m.id] || []);
+      d.f = db.freezers.length ? db.freezers[0].id : null;
+    } else if (m.k === 'prod') {
+      d.name = p ? p.name : '';
+      d.color = p ? p.color : COLORES[db.products.length % COLORES.length];
+      d.unit = p ? p.unit : 'bolsas';
+      d.min = p ? p.min : 2;
+    } else if (m.k === 'cong') {
+      var c = m.id ? congelador(m.id) : null;
+      d.name = c ? c.name : 'Congelador ' + (db.freezers.length + 1);
+    }
+    return d;
+  }
+
+  function tituloHoja(texto, color) {
+    return '<div class="hoja-tit">' + (color ? '<div class="marca" style="background:' + esc(color) + '"></div>' : '') +
+      '<h2>' + esc(texto) + '</h2><button class="cerrar" data-a="cancelar">Cancelar</button></div>';
+  }
+  function numeros(desde, max, sel) {
+    var h = '<div class="nums">';
+    for (var i = desde; i <= desde + 11; i++) {
+      h += '<button class="num' + (sel === i ? ' sel' : '') + '" data-a="num" data-v="' + i + '"' + (i > max ? ' disabled' : '') + '>' + i + '</button>';
+    }
+    return h + '</div>';
+  }
+  function stepper(valor, texto, accion) {
+    return '<div class="stepper"><button data-a="' + accion + '" data-v="-1">−</button>' +
+      '<div class="valor">' + valor + '</div><button data-a="' + accion + '" data-v="1">+</button>' +
+      '<div class="txt">' + esc(texto) + '</div></div>';
+  }
+  function eleccionCong(sel, soloEstos) {
+    var lista = soloEstos || db.freezers.map(function (c) { return c.id; });
+    var h = '<div class="opcs">';
+    lista.forEach(function (id) {
+      h += '<button class="opc' + (sel === id ? ' sel' : '') + '" data-a="cong" data-v="' + id + '">' + esc(nombreCong(id)) + '</button>';
+    });
+    return h + '</div>';
+  }
+
+  function hojaEntrada(p) {
+    var h = tituloHoja(p.name, p.color);
+    h += '<div class="pregunta">¿Cuántas ' + esc(p.unit) + ' metiste?</div>' + numeros(1, 999, draft.n) +
+      stepper(draft.n, 'para más de 12', 'paso');
+    if (db.freezers.length > 1) h += '<div class="pregunta">¿En qué congelador?</div>' + eleccionCong(draft.f);
+    h += '<div class="pregunta">¿Cuándo la hiciste?</div><div class="opcs">' +
+      '<button class="opc' + (draft.cuando === 'hoy' ? ' sel' : '') + '" data-a="cuando" data-v="hoy">Hoy</button>' +
+      '<button class="opc' + (draft.cuando === 'ayer' ? ' sel' : '') + '" data-a="cuando" data-v="ayer">Ayer</button>' +
+      '<button class="opc' + (draft.cuando === 'otro' ? ' sel' : '') + '" data-a="cuando" data-v="otro">Otro día</button></div>';
+    if (draft.cuando === 'otro') h += '<input type="date" class="texto" id="fecha" max="' + hoy() + '" value="' + draft.d + '">';
+    h += '<div class="pie"><button class="btn btn-guardar" data-a="guardar"' + (draft.n > 0 ? '' : ' disabled') + '>' +
+      (draft.n > 0 ? 'Guardar: metí ' + cuantas(p, draft.n) : 'Toca cuántas ' + esc(p.unit)) + '</button></div>';
+    return h;
+  }
+
+  function hojaSalida(p) {
+    var lotes = calcular()[p.id], tot = suma(lotes);
+    var h = tituloHoja(p.name, p.color);
+    if (tot === 0) {
+      return h + '<p style="font-size:26px">Según la app no hay ' + esc(p.unit) + ' de ' + esc(p.name) + '.</p>' +
+        '<p>Si sí hay, toca <b>Corregir cuántas hay</b>.</p>' +
+        '<div class="pie"><button class="btn btn-guardar" data-a="corregirDesdeSalida" data-id="' + p.id + '">Corregir cuántas hay</button></div>';
+    }
+    h += '<div class="pregunta">¿Cuántas ' + esc(p.unit) + ' sacaste? <span class="gris">(hay ' + tot + ')</span></div>' +
+      numeros(1, tot, draft.n);
+    if (tot > 12) h += stepper(draft.n, 'para más de 12', 'paso');
+    var congs = porCongelador(lotes).map(function (x) { return x.f; });
+    if (congs.length > 1) h += '<div class="pregunta">¿De qué congelador?</div>' + eleccionCong(draft.f, congs);
+    if (draft.n > 0) {
+      var copia = lotes.map(function (x) { return { d: x.d, f: x.f, n: x.n, t: x.t }; });
+      var plan = tomar(copia, draft.n, draft.f);
+      h += '<div class="consejo"><b>Saca primero lo más viejo:</b>' + plan.map(function (x) {
+        return '<div>• ' + cuantas(p, x.n) + ' del ' + fechaCorta(x.d) +
+          (db.freezers.length > 1 ? ' — ' + esc(nombreCong(x.f)) : '') + '</div>';
+      }).join('') + '</div>';
+    }
+    h += '<div class="pie"><button class="btn btn-guardar" data-a="guardar"' + (draft.n > 0 ? '' : ' disabled') + '>' +
+      (draft.n > 0 ? 'Guardar: saqué ' + cuantas(p, draft.n) : 'Toca cuántas ' + esc(p.unit)) + '</button></div>';
+    return h;
+  }
+
+  function hojaCorregir(p) {
+    var tot = suma(calcular()[p.id]);
+    var h = tituloHoja(p.name, p.color);
+    h += '<p>Usa esto si contaste y no coincide con la app. La app dice que hay <b>' + cuantas(p, tot) + '</b>.</p>';
+    h += '<div class="pregunta">¿Cuántas ' + esc(p.unit) + ' hay de verdad?</div>' + numeros(0, 999, draft.n) +
+      stepper(draft.n, 'para más de 11', 'paso');
+    if (draft.n > tot && db.freezers.length > 1) h += '<div class="pregunta">¿En qué congelador están las que faltaban?</div>' + eleccionCong(draft.f);
+    h += '<div class="pie"><button class="btn btn-guardar" data-a="guardar"' + (draft.n !== tot ? '' : ' disabled') + '>' +
+      (draft.n !== tot ? 'Guardar: hay ' + cuantas(p, draft.n) : 'Toca cuántas hay') + '</button></div>';
+    return h;
+  }
+
+  function hojaProducto(p) {
+    var h = tituloHoja(p ? 'Cambiar ' + p.name : 'Producto nuevo', draft.color);
+    h += '<div class="pregunta">Nombre</div><input class="texto" id="nombre" maxlength="40" autocomplete="off" placeholder="Ej. Salsa de chile de árbol" value="' + esc(draft.name) + '">';
+    if (draft.error) h += '<div class="error">' + esc(draft.error) + '</div>';
+    h += '<div class="pregunta">Color</div><div class="opcs">';
+    COLORES.forEach(function (c) {
+      h += '<button class="color' + (draft.color === c ? ' sel' : '') + '" style="background:' + c + '" data-a="color" data-v="' + c + '" aria-label="Color"></button>';
+    });
+    h += '</div><div class="pregunta">¿Cómo la guardas?</div><div class="opcs">';
+    UNIDADES.forEach(function (u) {
+      h += '<button class="opc' + (draft.unit === u ? ' sel' : '') + '" data-a="unidad" data-v="' + u + '">En ' + u + '</button>';
+    });
+    h += '</div><div class="pregunta">Avísame cuando queden</div>' + stepper(draft.min, draft.unit + ' o menos', 'pasoMin');
+    h += '<div class="pie"><button class="btn btn-guardar" data-a="guardar">Guardar</button></div>';
+    return h;
+  }
+
+  function hojaCongelador(c) {
+    var h = tituloHoja(c ? 'Cambiar nombre' : 'Congelador nuevo');
+    h += '<div class="pregunta">Nombre del congelador</div><input class="texto" id="nombre" maxlength="30" autocomplete="off" placeholder="Ej. Congelador grande" value="' + esc(draft.name) + '">';
+    if (draft.error) h += '<div class="error">' + esc(draft.error) + '</div>';
+    h += '<div class="pie"><button class="btn btn-guardar" data-a="guardar">Guardar</button></div>';
+    return h;
+  }
+
+  function hojaConfirmar(m) {
+    return tituloHoja(m.titulo) + '<p style="font-size:24px">' + m.texto + '</p>' +
+      '<div class="fila-btns"><button class="btn btn-sec" data-a="cancelar">No, regresar</button>' +
+      '<button class="btn btn-rojo" data-a="ok">' + esc(m.boton) + '</button></div>';
+  }
+
+  function renderModal() {
+    var el = document.getElementById('modal');
+    var h = '';
+    if (modal) {
+      var p = modal.id ? producto(modal.id) : null;
+      if (modal.k === 'in' && p) h = hojaEntrada(p);
+      else if (modal.k === 'out' && p) h = hojaSalida(p);
+      else if (modal.k === 'fix' && p) h = hojaCorregir(p);
+      else if (modal.k === 'prod') h = hojaProducto(p);
+      else if (modal.k === 'cong') h = hojaCongelador(modal.id ? congelador(modal.id) : null);
+      else if (modal.k === 'confirmar') h = hojaConfirmar(modal);
+    }
+    if (h) {
+      el.innerHTML = '<div class="hoja">' + h + '</div>';
+      el.className = 'abierto';
+      document.body.className = 'con-modal';
+    } else {
+      el.innerHTML = '';
+      el.className = '';
+      document.body.className = '';
+    }
+  }
+
+  function confirmar(titulo, texto, boton, fn) {
+    alConfirmar = fn;
+    abrir({ k: 'confirmar', titulo: titulo, texto: texto, boton: boton });
+  }
+
+  // ---------- aviso de abajo ----------
+  var timerToast = null;
+  function aviso(texto, deshacerId) {
+    var el = document.getElementById('toast');
+    el.innerHTML = '<div class="t">' + texto + '</div>' +
+      (deshacerId ? '<button data-a="deshacer" data-id="' + deshacerId + '">Deshacer</button>' : '');
+    el.className = 'visible';
+    clearTimeout(timerToast);
+    timerToast = setTimeout(function () { el.className = ''; }, 8000);
+  }
+  function quitarAviso() { clearTimeout(timerToast); document.getElementById('toast').className = ''; }
+
+  // ---------- guardar ----------
+  function guardar() {
+    var p = modal.id ? producto(modal.id) : null;
+    var k = modal.k, m, tot;
+    if (k === 'in') {
+      if (!(draft.n > 0)) return;
+      m = agregarMov({ type: 'in', p: p.id, n: draft.n, f: draft.f, d: draft.cuando === 'hoy' ? hoy() : draft.cuando === 'ayer' ? ayer() : draft.d });
+      cerrarModal();
+      aviso('Listo: metiste ' + cuantas(p, m.n) + ' de ' + esc(p.name) + '. Ahora hay ' + suma(calcular()[p.id]) + '.', m.id);
+    } else if (k === 'out') {
+      tot = suma(calcular()[p.id]);
+      if (!(draft.n > 0) || draft.n > tot) return;
+      m = agregarMov({ type: 'out', p: p.id, n: draft.n, f: draft.f });
+      cerrarModal();
+      aviso('Listo: sacaste ' + cuantas(p, m.n) + ' de ' + esc(p.name) + '. Quedan ' + (tot - m.n) + '.', m.id);
+    } else if (k === 'fix') {
+      tot = suma(calcular()[p.id]);
+      if (draft.n === tot) return;
+      m = agregarMov({ type: 'fix', p: p.id, n: draft.n, prev: tot, f: draft.f, d: hoy() });
+      cerrarModal();
+      aviso('Listo: ahora hay ' + cuantas(p, m.n) + ' de ' + esc(p.name) + '.', m.id);
+    } else if (k === 'prod') {
+      var nombre = (draft.name || '').replace(/\s+/g, ' ').trim();
+      if (!nombre) { draft.error = 'Escribe el nombre.'; renderModal(); return; }
+      var repetido = db.products.some(function (x) { return x !== p && x.name.toLowerCase() === nombre.toLowerCase(); });
+      if (repetido) { draft.error = 'Ya hay un producto con ese nombre.'; renderModal(); return; }
+      if (p) {
+        p.name = nombre; p.color = draft.color; p.unit = draft.unit; p.min = draft.min;
+      } else {
+        db.products.push({ id: uid(), name: nombre, color: draft.color, unit: draft.unit, min: draft.min });
+      }
+      guardarDb();
+      cerrarModal();
+      aviso(p ? 'Listo: cambios guardados.' : 'Listo: agregaste ' + esc(nombre) + '.');
+    } else if (k === 'cong') {
+      var n = (draft.name || '').replace(/\s+/g, ' ').trim();
+      if (!n) { draft.error = 'Escribe el nombre.'; renderModal(); return; }
+      var c = modal.id ? congelador(modal.id) : null;
+      if (c) c.name = n; else db.freezers.push({ id: uid(), name: n });
+      guardarDb();
+      cerrarModal();
+      aviso('Listo.');
+    }
+  }
+
+  // ---------- respaldo ----------
+  function respaldo() {
+    var nombre = 'respaldo-congeladores-' + hoy() + '.txt';
+    var texto = JSON.stringify({ app: 'congeladores', fecha: new Date().toISOString(), db: db });
+    var blob = new Blob([texto], { type: 'text/plain' });
+    function marcar() { db.settings.ultimoRespaldo = Date.now(); guardarDb(); render(); }
+    function descargar() {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = nombre;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+      marcar();
+      aviso('Se guardó el archivo ' + esc(nombre) + ' en Descargas.');
+    }
+    try {
+      var archivo = new File([blob], nombre, { type: 'text/plain' });
+      if (navigator.canShare && navigator.canShare({ files: [archivo] })) {
+        navigator.share({ files: [archivo], title: 'Respaldo congeladores' }).then(function () {
+          marcar();
+          aviso('Listo: respaldo enviado.');
+        }, function (e) {
+          if (!e || e.name !== 'AbortError') descargar();
+        });
+        return;
+      }
+    } catch (e) {}
+    descargar();
+  }
+
+  document.getElementById('archivo').addEventListener('change', function () {
+    var f = this.files && this.files[0];
+    this.value = '';
+    if (!f) return;
+    var r = new FileReader();
+    r.onload = function () {
+      var obj;
+      try { obj = JSON.parse(r.result); } catch (e) { obj = null; }
+      if (!obj || obj.app !== 'congeladores' || !valido(obj.db)) {
+        aviso('Ese archivo no es un respaldo de esta app.');
+        return;
+      }
+      var cuando = obj.fecha ? fechaCorta(ymd(new Date(obj.fecha))) : 'sin fecha';
+      confirmar('Recuperar respaldo', 'Esto cambia todo lo que hay en la tablet por el respaldo del <b>' + esc(cuando) + '</b>. ¿Seguro?', 'Sí, recuperar', function () {
+        db = obj.db;
+        guardarDb();
+        render();
+        aviso('Listo: se recuperó el respaldo.');
+      });
+    };
+    r.readAsText(f);
+  });
+
+  // ---------- botones ----------
+  var acciones = {
+    historial: function () { ir({ v: 'historial' }); },
+    ajustes: function () { ir({ v: 'ajustes' }); },
+    producto: function (id) { ir({ v: 'producto', id: id }); },
+    regresar: function () { history.back(); },
+    meti: function (id) { abrir({ k: 'in', id: id }); },
+    saque: function (id) { abrir({ k: 'out', id: id }); },
+    corregir: function (id) { abrir({ k: 'fix', id: id }); },
+    corregirDesdeSalida: function (id) {
+      // Cambia la ventana sin dejar otra entrada en el historial del botón atrás.
+      modal = { k: 'fix', id: id };
+      draft = nuevoDraft(modal);
+      history.replaceState({ p: pantalla, m: modal }, '');
+      renderModal();
+    },
+    nuevo: function () { abrir({ k: 'prod' }); },
+    editar: function (id) { abrir({ k: 'prod', id: id }); },
+    cancelar: function () { cerrarModal(); },
+    num: function (id, v) { draft.n = +v; renderModal(); },
+    paso: function (id, v) {
+      var min = modal.k === 'fix' ? 0 : 1;
+      var max = modal.k === 'out' ? suma(calcular()[modal.id]) : 999;
+      draft.n = Math.max(min, Math.min(max, draft.n + +v));
+      renderModal();
+    },
+    pasoMin: function (id, v) { draft.min = Math.max(0, Math.min(50, draft.min + +v)); renderModal(); },
+    cong: function (id, v) { draft.f = v; renderModal(); },
+    cuando: function (id, v) { draft.cuando = v; renderModal(); },
+    color: function (id, v) { draft.color = v; renderModal(); },
+    unidad: function (id, v) { draft.unit = v; renderModal(); },
+    guardar: function () { guardar(); },
+    ok: function () {
+      var fn = alConfirmar;
+      alConfirmar = null;
+      cerrarModal();
+      if (fn) fn();
+    },
+    deshacer: function (id) {
+      borrarMov(id);
+      quitarAviso();
+      render();
+      aviso('Se deshizo.');
+    },
+    borrarMov: function (id) {
+      var m = null;
+      db.movements.forEach(function (x) { if (x.id === id) m = x; });
+      if (!m) return;
+      confirmar('Borrar movimiento', '¿Borrar este movimiento?<br>' + textoMov(m) + '<br><br>Úsalo solo si fue un error.', 'Sí, borrar', function () {
+        borrarMov(id);
+        render();
+        aviso('Listo: se borró.');
+      });
+    },
+    borrarProd: function (id) {
+      var p = producto(id);
+      var tot = suma(calcular()[id]);
+      confirmar('Borrar ' + p.name, (tot ? 'Todavía hay <b>' + cuantas(p, tot) + '</b>. ' : '') +
+        'Se borra <b>' + esc(p.name) + '</b> y todo su historial. ¿Seguro?', 'Sí, borrar', function () {
+        db.products = db.products.filter(function (x) { return x.id !== id; });
+        db.movements = db.movements.filter(function (x) { return x.p !== id; });
+        guardarDb();
+        pantalla = { v: 'inicio' };
+        history.replaceState({ p: pantalla, m: null }, '');
+        render();
+        aviso('Listo: se borró ' + esc(p.name) + '.');
+      });
+    },
+    nuevoCong: function () { abrir({ k: 'cong' }); },
+    renCong: function (id) { abrir({ k: 'cong', id: id }); },
+    borrarCong: function (id) {
+      var L = calcular(), n = 0;
+      Object.keys(L).forEach(function (k) { L[k].forEach(function (x) { if (x.f === id) n += x.n; }); });
+      if (n > 0) { aviso('Ese congelador todavía tiene comida. Primero sácala o corrige el conteo.'); return; }
+      if (db.freezers.length <= 1) { aviso('Tiene que quedar al menos un congelador.'); return; }
+      var c = congelador(id);
+      confirmar('Quitar congelador', '¿Quitar <b>' + esc(c.name) + '</b>?', 'Sí, quitar', function () {
+        db.freezers = db.freezers.filter(function (x) { return x.id !== id; });
+        guardarDb();
+        render();
+      });
+    },
+    maxDias: function (id, v) { db.settings.maxDias = +v; guardarDb(); render(); },
+    respaldo: function () { respaldo(); },
+    recuperar: function () { document.getElementById('archivo').click(); }
+  };
+
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest ? e.target.closest('[data-a]') : null;
+    if (!el || el.disabled) return;
+    var fn = acciones[el.getAttribute('data-a')];
+    if (fn) fn(el.getAttribute('data-id'), el.getAttribute('data-v'));
+  });
+  document.addEventListener('input', function (e) {
+    if (!draft) return;
+    if (e.target.id === 'nombre') { draft.name = e.target.value; draft.error = ''; }
+    if (e.target.id === 'fecha' && e.target.value) draft.d = e.target.value;
+  });
+  document.addEventListener('change', function (e) {
+    if (draft && e.target.id === 'fecha' && e.target.value) draft.d = e.target.value;
+  });
+  document.getElementById('modal').addEventListener('click', function (e) {
+    if (e.target === this) cerrarModal();
+  });
+
+  // Si la app se queda abierta toda la noche, que cambie la fecha al otro día.
+  var diaMostrado = hoy();
+  setInterval(function () {
+    if (hoy() !== diaMostrado && !modal) { diaMostrado = hoy(); render(); }
+  }, 60000);
+
+  // ---------- arranque ----------
+  if (history.state && history.state.p) {
+    pantalla = history.state.p;
+    history.replaceState({ p: pantalla, m: null }, '');
+  } else {
+    history.replaceState({ p: pantalla, m: null }, '');
+  }
+  render();
+
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  }
+})();
+</script>
+</body>
+</html>
