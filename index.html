@@ -233,6 +233,8 @@
     margin: 5px; min-height: 64px; padding: 8px 20px; font-size: 24px; font-weight: 700;
     background: #fff; border: 2px solid var(--line); border-radius: 14px;
   }
+  .opcs-cong { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); grid-gap: 10px; }
+  .opcs-cong .opc { margin: 0; padding: 8px 10px; line-height: 1.15; }
   .color { width: 72px; height: 64px; border-radius: 14px; border: 4px solid #fff; margin: 5px; box-shadow: 0 0 0 2px var(--line); }
   .color.sel { box-shadow: 0 0 0 4px var(--ink); }
   .texto {
@@ -330,8 +332,12 @@
   function cuantas(p, n) { return n + ' ' + unidad(p, n); }
 
   // ---------- datos ----------
+  function congeladoresIniciales() {
+    return ['Congelador de afuera', 'Congelador parado', 'Congelador acostado'].map(function (n) {
+      return { id: uid(), name: n };
+    });
+  }
   function estadoInicial() {
-    var c1 = uid(), c2 = uid();
     var base = [
       ['Salsa roja', '#c62828'], ['Salsa verde', '#2e7d32'], ['Barbacoa', '#6d4c41'],
       ['Picadillo', '#ef6c00'], ['Frijoles', '#6a1b9a'], ['Deshebrada', '#f9a825'],
@@ -340,7 +346,7 @@
     return {
       version: 1,
       products: base.map(function (b) { return { id: uid(), name: b[0], color: b[1], unit: 'bolsas', min: 2 }; }),
-      freezers: [{ id: c1, name: 'Congelador 1' }, { id: c2, name: 'Congelador 2' }],
+      freezers: congeladoresIniciales(),
       movements: [],
       settings: { maxDias: 60, ultimoRespaldo: null }
     };
@@ -351,7 +357,12 @@
   function cargar() {
     try {
       var d = JSON.parse(localStorage.getItem(CLAVE));
-      if (valido(d)) return d;
+      if (valido(d)) {
+        // La versión 1 traía "Congelador 1" y "Congelador 2"; si nunca se usó, se cambian por los de la cocina.
+        var nombres = d.freezers.map(function (c) { return c.name; }).join('|');
+        if (!d.movements.length && nombres === 'Congelador 1|Congelador 2') d.freezers = congeladoresIniciales();
+        return d;
+      }
     } catch (e) {}
     return estadoInicial();
   }
@@ -700,7 +711,7 @@
   }
   function eleccionCong(sel, soloEstos) {
     var lista = soloEstos || db.freezers.map(function (c) { return c.id; });
-    var h = '<div class="opcs">';
+    var h = '<div class="opcs-cong">';
     lista.forEach(function (id) {
       h += '<button class="opc' + (sel === id ? ' sel' : '') + '" data-a="cong" data-v="' + id + '">' + esc(nombreCong(id)) + '</button>';
     });
